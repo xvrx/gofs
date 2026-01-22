@@ -48,7 +48,7 @@ func UpdateDocVaultHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jsonPath := filepath.Join(scannedDir, "data.json")
+	jsonPath := filepath.Join("src", "libs", "scanned.json")
 	err = os.WriteFile(jsonPath, jsonData, 0644)
 	if err != nil {
 		http.Error(w, "Failed to write JSON file", http.StatusInternalServerError)
@@ -63,8 +63,8 @@ func UpdateDocVaultHandler(w http.ResponseWriter, r *http.Request) {
 
 // GetDocVaultHandler reads data from data.json and filters it based on the owner query parameter.
 func GetDocVaultHandler(w http.ResponseWriter, r *http.Request) {
-	scannedDir := "src/scanned"
-	jsonPath := filepath.Join(scannedDir, "data.json")
+	jsonPath := filepath.Join("src", "libs", "scanned.json")
+
 	// Get owner from query parameter
 	// filterOwner := r.URL.Query().Get("owner")
 	filterOwner := "bayu"
@@ -72,14 +72,14 @@ func GetDocVaultHandler(w http.ResponseWriter, r *http.Request) {
 	// Read the data.json file
 	jsonData, err := os.ReadFile(jsonPath)
 	if err != nil {
-		http.Error(w, "Failed to read data.json", http.StatusInternalServerError)
+		http.Error(w, "Failed to read scanned.json", http.StatusInternalServerError)
 		return
 	}
 
 	var docsByOwner map[string][]DocItem
 	err = json.Unmarshal(jsonData, &docsByOwner)
 	if err != nil {
-		http.Error(w, "Failed to unmarshal data.json", http.StatusInternalServerError)
+		http.Error(w, "Failed to unmarshal scanned.json", http.StatusInternalServerError)
 		return
 	}
 

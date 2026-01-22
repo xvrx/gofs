@@ -12,8 +12,8 @@ import (
 
 // UpdateOutboxHandler reads an Excel file, converts its data to JSON, and saves it.
 func UpdateOutboxHandler(w http.ResponseWriter, r *http.Request) {
-	excelPath := filepath.Join("src", "outbox", "data.xlsx")
-	jsonPath := "src/outbox/data.json"
+	excelPath := filepath.Join("src", "libs", "outbox.xlsx")
+	jsonPath := "src/libs/outbox.json"
 	sheetName := "Sheet1"
 
 	// Open the Excel file
@@ -89,7 +89,7 @@ func UpdateOutboxHandler(w http.ResponseWriter, r *http.Request) {
 
 // GetOutboxData serves the content of src/outbox/data.json
 func GetOutboxData(w http.ResponseWriter, r *http.Request) {
-	jsonPath := filepath.Join("src", "outbox", "data.json")
+	jsonPath := filepath.Join("src", "libs", "outbox.json")
 
 	// Read the JSON file from the disk
 	jsonData, err := os.ReadFile(jsonPath)

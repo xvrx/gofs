@@ -1,13 +1,12 @@
+
+GET http://localhost:3000
+
+
 ### ❗❗❗❗❗ AUTH
 GET http://localhost:3000/auth/session
 
 
-
-###❗❗❗❗❗ MAIN
-
-GET http://localhost:3000
-
-###
+### 📩 📩 📩 SURAT KELUAR
 
 GET http://localhost:3000/outbox/update
 
@@ -15,7 +14,8 @@ GET http://localhost:3000/outbox/update
 
 GET http://localhost:3000/outbox/get
 
-###
+
+### 🖨️ 🖨️ 🖨️ SCAN DOKUMEN
 
 GET http://localhost:3000/docvault/update
 
