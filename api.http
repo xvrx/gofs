@@ -1,0 +1,24 @@
+### ❗❗❗❗❗ AUTH
+GET http://localhost:3000/auth/session
+
+
+
+###❗❗❗❗❗ MAIN
+
+GET http://localhost:3000
+
+###
+
+GET http://localhost:3000/outbox/update
+
+###
+
+GET http://localhost:3000/outbox/get
+
+###
+
+GET http://localhost:3000/docvault/update
+
+###
+
+GET http://localhost:3000/docvault/get
