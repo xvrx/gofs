@@ -1,15 +1,18 @@
 package config
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-redis/redis/v8"
 	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
 	Redis RedisConfig `yaml:"redis"`
+	MySQL MySQLConfig `yaml:"mysql"`
 }
 
 type RedisConfig struct {
@@ -18,8 +21,19 @@ type RedisConfig struct {
 	DB       int    `yaml:"db"`
 }
 
-var AppConfig Config
-var RedisClient *redis.Client
+type MySQLConfig struct {
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	Database string `yaml:"database"`
+}
+
+var (
+	AppConfig   Config
+	RedisClient *redis.Client
+	DB          *sql.DB
+)
 
 func LoadConfig() error {
 	configPath := "config/config.yaml"
@@ -48,5 +62,27 @@ func InitRedis() error {
 		return fmt.Errorf("failed to connect to Redis: %w", err)
 	}
 	fmt.Println("Connected to Redis!")
+	return nil
+}
+
+func InitMySQL() error {
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
+		AppConfig.MySQL.User,
+		AppConfig.MySQL.Password,
+		AppConfig.MySQL.Host,
+		AppConfig.MySQL.Port,
+		AppConfig.MySQL.Database)
+
+	var err error
+	DB, err = sql.Open("mysql", dsn)
+	if err != nil {
+		return fmt.Errorf("failed to open database connection: %w", err)
+	}
+
+	if err = DB.Ping(); err != nil {
+		return fmt.Errorf("failed to connect to MySQL: %w", err)
+	}
+
+	fmt.Println("Connected to MySQL!")
 	return nil
 }

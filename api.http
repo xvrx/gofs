@@ -3,10 +3,20 @@ GET http://localhost:3000
 
 
 ### ❗❗❗❗❗ AUTH
+POST http://localhost:3000/auth/login
+content-type: application/json
+
+{
+    "nip": "817931767",
+    "password": "767"
+}
+
+
+###
 GET http://localhost:3000/auth/session
 
 
-### 📩 📩 📩 SURAT KELUAR
+### 📩 📩 📩 OUTBOX / SURAT KELUAR
 
 GET http://localhost:3000/outbox/update
 
@@ -15,7 +25,7 @@ GET http://localhost:3000/outbox/update
 GET http://localhost:3000/outbox/get
 
 
-### 🖨️ 🖨️ 🖨️ SCAN DOKUMEN
+### 🖨️ 🖨️ 🖨️ DOCVAULT / SCAN DOKUMEN
 
 GET http://localhost:3000/docvault/update
 
