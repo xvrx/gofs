@@ -39,13 +39,16 @@ const (
 
 // getSessionDataFromRedis retrieves session data from Redis using the session token from cookies.
 func getSessionDataFromRedis(r *http.Request) (*AuthData, error) {
+	print("auth middleware accessed! \n")
 	// client cookie side = session_token
 	cookie, err := r.Cookie("session_token")
 	if err != nil {
+
 		return nil, fmt.Errorf("session token cookie not found: %w", err)
 	}
 	sessionToken := cookie.Value
 
+	print("cookie found:", sessionToken)
 	// if token exist, match session_token in redisDB
 	ctx := context.Background()                                    // ctx is required when making redis Get() call                              // empty context - no call time limit
 	val, err := config.RedisClient.Get(ctx, sessionToken).Result() // Use sessionToken directly as key
@@ -65,9 +68,6 @@ func getSessionDataFromRedis(r *http.Request) (*AuthData, error) {
 	return &authData, nil
 }
 
-
-
-
 // AuthMiddleware checks for a valid session token and authenticates the request.
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -83,17 +83,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-
-
-
-
-
-
-
-
-
-
-
 // GetSessionHandler checks for an existing session in Redis and returns the authentication data.
 func GetSessionHandler(w http.ResponseWriter, r *http.Request) {
 	authData, err := getSessionDataFromRedis(r)
@@ -107,10 +96,6 @@ func GetSessionHandler(w http.ResponseWriter, r *http.Request) {
 	response := map[string]any{"status": true, "data": authData}
 	json.NewEncoder(w).Encode(response)
 }
-
-
-
-
 
 // LoginHandler handles user login requests
 func LoginHandler(w http.ResponseWriter, r *http.Request) {

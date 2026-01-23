@@ -1,6 +1,7 @@
 
+# @no-cookie-jar
 GET http://localhost:3000
-
+Cookie: session_token=817931767|sess:5224f6a1-68c5-490f-8976-c941f30da00b
 
 ### ❗❗❗❗❗ AUTH
 POST http://localhost:3000/auth/login
@@ -13,12 +14,16 @@ content-type: application/json
 
 
 ###
-GET http://localhost:3000/auth/session
 
+# @no-cookie-jar
+GET http://localhost:3000/auth/session
+Cookie: session_token=817931767|sess:5224f6a1-68c5-490f-8976-c941f30da00b
 
 ### 📩 📩 📩 OUTBOX / SURAT KELUAR
 
 GET http://localhost:3000/outbox/update
+
+Cookie: session_token=abc12345; user_pref=darkmode
 
 ###
 
