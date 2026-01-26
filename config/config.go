@@ -76,14 +76,13 @@ func InitRedis() error {
 func InitMySQL() error {
 	DB = make(map[string]*sql.DB)
 	for name, config := range AppConfig.MySQL {
-		dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
+		// Connect without specifying the database
+		dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/?parseTime=true",
 			config.User,
 			config.Password,
 			config.Host,
-			config.Port,
-			config.Database)
+			config.Port)
 
-		var err error
 		db, err := sql.Open("mysql", dsn)
 		if err != nil {
 			return fmt.Errorf("failed to open database connection for %s: %w", name, err)
@@ -92,6 +91,31 @@ func InitMySQL() error {
 		if err = db.Ping(); err != nil {
 			return fmt.Errorf("failed to connect to MySQL for %s: %w", name, err)
 		}
+
+		// Create the database if it doesn't exist
+		_, err = db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", config.Database))
+		if err != nil {
+			return fmt.Errorf("failed to create database %s: %w", config.Database, err)
+		}
+		db.Close()
+
+		// Connect to the specific database
+		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
+			config.User,
+			config.Password,
+			config.Host,
+			config.Port,
+			config.Database)
+
+		db, err = sql.Open("mysql", dsn)
+		if err != nil {
+			return fmt.Errorf("failed to open database connection for %s: %w", name, err)
+		}
+
+		if err = db.Ping(); err != nil {
+			return fmt.Errorf("failed to connect to MySQL for %s: %w", name, err)
+		}
+
 		DB[name] = db
 		fmt.Printf("Connected to MySQL database '%s'!\n", name)
 	}

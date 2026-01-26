@@ -48,12 +48,17 @@ func main() {
 	// Public routes (no authentication required)
 	router.HandleFunc("/auth/login", handlers.LoginHandler).Methods("POST")
 
-	// ------------ Use Auth Middleware ---------------------
+	// ------------ Auth Middleware ---------------------
 	authenticatedRouter := router.PathPrefix("/").Subrouter()
+	// uncomment line below
 	// authenticatedRouter.Use(handlers.AuthMiddleware)
 
-	// ---------- no auth --- dev only -- comment out the auth
+
+	//! ---------- no auth --- dev only -- 
+	//! to activate auth on route,comment line below and uncomment out the auth middleware
 	authenticatedRouter.Use(skip)
+
+
 
 	// ---------- route requiring authentication
 	authenticatedRouter.HandleFunc("/", handlers.HomeHandler).Methods("GET")

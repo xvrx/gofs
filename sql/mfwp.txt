@@ -1,0 +1,131 @@
+DROP TABLE IF EXISTS masterfile;
+
+CREATE TABLE masterfile (
+    TANGGAL_DAFTAR     DATE,
+    TANGGAL_PINDAH     DATE,
+    TANGGAL_LAHIR      DATE,
+    NPWP               VARCHAR(15),
+    KD_KPP             VARCHAR(10),
+    KD_CABANG          VARCHAR(10),
+    PUSAT_CABANG       VARCHAR(10),
+    NPWP_15            VARCHAR(15),
+    NAMA_WP            VARCHAR(255),
+    ALAMAT             VARCHAR(500),
+    KOTA               VARCHAR(100),
+    KODE_POS           VARCHAR(10),
+    NOMOR_TELEPON      VARCHAR(25),
+    NOMOR_FAX          VARCHAR(25),
+    EMAIL              VARCHAR(255),
+    NOMOR_IDENTITAS    VARCHAR(50),
+    STATUS_WP          VARCHAR(50),
+    JENIS_WP           VARCHAR(50),
+    KODE_KLU           VARCHAR(15),
+    NAMA_KLU           VARCHAR(255),
+    SEKTOR             VARCHAR(100),
+    TANGGAL_PKP        DATE,
+    KELURAHAN          VARCHAR(100),
+    KECAMATAN          VARCHAR(100),
+    PROPINSI           VARCHAR(100),
+    BENTUK_HUKUM       VARCHAR(100),
+    MATA_UANG          VARCHAR(3),
+    NO_SKT             VARCHAR(50),
+    NO_PKP             VARCHAR(50),
+    NO_PKP_CABUT       VARCHAR(50),
+    TGL_PKP_CABUT      DATE,
+    METODE_PERHITUNGAN VARCHAR(100),
+    NIP_AR             CHAR(18),
+    NAMA_AR            VARCHAR(255),
+    SEKSI              VARCHAR(100),
+    NIP_JS             VARCHAR(18),
+    NAMA_JS            VARCHAR(255),
+    NIP_EKS            VARCHAR(18),
+    NAMA_EKS           VARCHAR(255),
+    JNS_BADAN_HUKUM    VARCHAR(100),
+    STATUS_MODAL       VARCHAR(100),
+    KATEGORI           VARCHAR(100),
+    ID_BL_BUKU_AWAL    YEAR,
+    ID_BL_BUKU_AKHIR   YEAR,
+    NPWP16             VARCHAR(16),
+    STS_16             VARCHAR(20),
+    TGL_UPDATE16       DATETIME
+);
+
+
+INSERT INTO masterfile
+SELECT
+    STR_TO_DATE(NULLIF(TANGGAL_DAFTAR,''), '%d/%m/%Y %H:%i:%s'),
+    STR_TO_DATE(NULLIF(TANGGAL_PINDAH,''), '%d/%m/%Y %H:%i:%s'),
+    STR_TO_DATE(NULLIF(TANGGAL_LAHIR,''), '%d/%m/%Y %H:%i:%s'),
+    NULLIF(NPWP,''),
+    NULLIF(KD_KPP,''),
+    NULLIF(KD_CABANG,''),
+    NULLIF(PUSAT_CABANG,''),
+    NULLIF(NPWP_15,''),
+    NULLIF(NAMA_WP,''),
+    NULLIF(ALAMAT,''),
+    NULLIF(KOTA,''),
+    NULLIF(KODE_POS,''),
+    NULLIF(NOMOR_TELEPON,''),
+    NULLIF(NOMOR_FAX,''),
+    NULLIF(EMAIL,''),
+    NULLIF(NOMOR_IDENTITAS,''),
+    NULLIF(STATUS_WP,''),
+    NULLIF(JENIS_WP,''),
+    NULLIF(KODE_KLU,''),
+    NULLIF(NAMA_KLU,''),
+    NULLIF(SEKTOR,''),
+    STR_TO_DATE(NULLIF(TANGGAL_PKP,''), '%d/%m/%Y %H:%i:%s'),
+    NULLIF(KELURAHAN,''),
+    NULLIF(KECAMATAN,''),
+    NULLIF(PROPINSI,''),
+    NULLIF(BENTUK_HUKUM,''),
+    NULLIF(MATA_UANG,''),
+    NULLIF(NO_SKT,''),
+    NULLIF(NO_PKP,''),
+    NULLIF(NO_PKP_CABUT,''),
+    STR_TO_DATE(NULLIF(TGL_PKP_CABUT,''), '%d/%m/%Y %H:%i:%s'),
+    NULLIF(METODE_PERHITUNGAN,''),
+    NULLIF(NIP_AR,''),
+    NULLIF(NAMA_AR,''),
+    NULLIF(SEKSI,''),
+    NULLIF(NIP_JS,''),
+    NULLIF(NAMA_JS,''),
+    NULLIF(NIP_EKS,''),
+    NULLIF(NAMA_EKS,''),
+    NULLIF(JNS_BADAN_HUKUM,''),
+    NULLIF(STATUS_MODAL,''),
+    NULLIF(KATEGORI,''),
+    NULLIF(ID_BL_BUKU_AWAL,''),
+    NULLIF(ID_BL_BUKU_AKHIR,''),
+    NULLIF(NPWP16,''),
+    NULLIF(STS_16,''),
+    STR_TO_DATE(NULLIF(TGL_UPDATE16,''), '%d/%m/%Y %H:%i:%s')
+FROM masterfile_raw;
+
+
+"C:\Users\Administrator\Downloads\mfwp_sql.csv"
+
+-- enable loading local file
+SET GLOBAL local_infile = 1;
+
+mysql --local-infile=1 -h$MASTER_DB_HOST -u$MASTER_DB_USER -p$MASTER_DB_PASSWD  -D$MASTER_DB_NAME
+
+
+
+--- STAGING
+---
+
+-- optional : if running docker, copy from wsl dir into container directory
+-> : docker cp ~/mfwp_sql.csv mysql-server:/mfwp_sql.csv.
+
+* WARNING *
+-- enable local infile opt by running sql with infile params:
+mysql --local-infile -u your_user -p
+
+LOAD DATA LOCAL INFILE '/mfwp_sql.csv'
+INTO TABLE masterfile
+FIELDS TERMINATED BY ';'
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+
