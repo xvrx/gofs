@@ -1,6 +1,9 @@
-./src
-src/
-/src
-./src/
+
+
+/src/**/*.pdf
+/src/**/*.xlsx
+/src/**/*.xls
+/src/**/*.doc
+/src/**/*.docx
 main.exe
 /tmp

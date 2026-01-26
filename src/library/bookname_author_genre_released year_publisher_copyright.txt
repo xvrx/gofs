@@ -1,0 +1,7 @@
+bookname_author_genre_released year_publisher_copyright
+
+copyright : creative commons -> free
+
+
+genre : politics
+	philosophy
