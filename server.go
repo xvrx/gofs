@@ -9,6 +9,12 @@ import (
 	"github.com/gorilla/mux" // Import Gorilla Mux
 )
 
+func skip(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		next.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	// Load configuration
 	if err := config.LoadConfig(); err != nil {
@@ -33,16 +39,12 @@ func main() {
 	// Public routes (no authentication required)
 	router.HandleFunc("/auth/login", handlers.LoginHandler).Methods("POST")
 
-	// ----------- for dev ---------------------
-	// router.HandleFunc("/outbox/update", handlers.UpdateOutboxHandler).Methods("GET")
-	// router.HandleFunc("/outbox/get", handlers.GetOutboxData).Methods("GET")
-	// router.HandleFunc("/docvault/update", handlers.UpdateDocVaultHandler).Methods("GET")
-	// router.HandleFunc("/docvault/get", handlers.GetDocVaultHandler).Methods("GET")
-	// router.HandleFunc("/auth/session", handlers.GetSessionHandler).Methods("GET")
-
 	// ------------ Use Auth Middleware ---------------------
 	authenticatedRouter := router.PathPrefix("/").Subrouter()
-	authenticatedRouter.Use(handlers.AuthMiddleware)
+	// authenticatedRouter.Use(handlers.AuthMiddleware)
+
+	// ---------- no auth --- dev only -- comment out the auth
+	authenticatedRouter.Use(skip)
 
 	// ---------- route requiring authentication
 	authenticatedRouter.HandleFunc("/", handlers.HomeHandler).Methods("GET")
@@ -52,6 +54,7 @@ func main() {
 	authenticatedRouter.HandleFunc("/docvault/update", handlers.UpdateDocVaultHandler).Methods("GET")
 	authenticatedRouter.HandleFunc("/docvault/get", handlers.GetDocVaultHandler).Methods("GET")
 	authenticatedRouter.HandleFunc("/auth/session", handlers.GetSessionHandler).Methods("GET")
+	authenticatedRouter.HandleFunc("/mfwp/get/{npwp:[0-9]{15}}", handlers.GetMfwpData).Methods("GET")
 
 	fmt.Println("Server starting on port http://localhost:3000/ ")
 	// Use the Gorilla Mux router

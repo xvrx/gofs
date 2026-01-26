@@ -12,7 +12,7 @@ import (
 
 type Config struct {
 	Redis RedisConfig `yaml:"redis"`
-	MySQL MySQLConfig `yaml:"mysql"`
+	MySQL map[string]MySQLConfig `yaml:"mysql"`
 }
 
 type RedisConfig struct {
@@ -32,7 +32,7 @@ type MySQLConfig struct {
 var (
 	AppConfig   Config
 	RedisClient *redis.Client
-	DB          *sql.DB
+	DB          map[string]*sql.DB
 )
 
 func LoadConfig() error {
@@ -66,23 +66,26 @@ func InitRedis() error {
 }
 
 func InitMySQL() error {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
-		AppConfig.MySQL.User,
-		AppConfig.MySQL.Password,
-		AppConfig.MySQL.Host,
-		AppConfig.MySQL.Port,
-		AppConfig.MySQL.Database)
+	DB = make(map[string]*sql.DB)
+	for name, config := range AppConfig.MySQL {
+		dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
+			config.User,
+			config.Password,
+			config.Host,
+			config.Port,
+			config.Database)
 
-	var err error
-	DB, err = sql.Open("mysql", dsn)
-	if err != nil {
-		return fmt.Errorf("failed to open database connection: %w", err)
+		var err error
+		db, err := sql.Open("mysql", dsn)
+		if err != nil {
+			return fmt.Errorf("failed to open database connection for %s: %w", name, err)
+		}
+
+		if err = db.Ping(); err != nil {
+			return fmt.Errorf("failed to connect to MySQL for %s: %w", name, err)
+		}
+		DB[name] = db
+		fmt.Printf("Connected to MySQL database '%s'!\n", name)
 	}
-
-	if err = DB.Ping(); err != nil {
-		return fmt.Errorf("failed to connect to MySQL: %w", err)
-	}
-
-	fmt.Println("Connected to MySQL!")
 	return nil
 }

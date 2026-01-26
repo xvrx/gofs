@@ -37,3 +37,7 @@ GET http://localhost:3000/docvault/update
 ###
 
 GET http://localhost:3000/docvault/get
+
+
+### GET NPWP ⚡⚡
+GET http://localhost:3000/mfwp/get/010000131217002

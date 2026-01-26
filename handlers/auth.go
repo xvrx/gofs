@@ -109,7 +109,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// 1. Query MySQL to validate credentials
 	var user AuthData // Re-using AuthData struct for user info
 	query := "SELECT user_id, role, name, nip, jabatan, department_id FROM users WHERE nip = ? AND password = ?"
-	row := config.DB.QueryRow(query, req.NIP, req.Password)
+	row := config.DB["doctracer"].QueryRow(query, req.NIP, req.Password)
 	err = row.Scan(&user.UserID, &user.Role, &user.Name, &user.NIP, &user.Jabatan, &user.DepartmentID)
 
 	if err == sql.ErrNoRows {

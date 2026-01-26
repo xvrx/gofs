@@ -3,8 +3,15 @@ redis:
   password: "" # No password by default
   db: 0        # Default DB
 mysql:
-  user: "root"
-  password: "p@jak123"
-  host: "127.0.0.1"
-  port: "3306"
-  database: "doctracer"
+  doctracer:
+    user: "root"
+    password: "p@jak123"
+    host: "127.0.0.1"
+    port: "3306"
+    database: "doctracer"
+  mfwp:
+    user: "root"
+    password: "p@jak123"
+    host: "127.0.0.1"
+    port: "3306"
+    database: "mfwp"
