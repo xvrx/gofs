@@ -15,3 +15,11 @@ mysql:
     host: "127.0.0.1"
     port: "3306"
     database: "mfwp"
+ghostscript:
+  path: "C:/Program Files/gs/gs10.03.0/bin/gswin64c.exe"
+  compression_levels:
+    - "screen"
+    - "ebook"
+    - "printer"
+    - "prepress"
+    - "default"

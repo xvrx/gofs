@@ -5,14 +5,22 @@ import (
 	"fmt"
 	"os"
 
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-redis/redis/v8"
+	_ "github.com/go-sql-driver/mysql"
+
+	// "github.com/go-redis/redis/v8"
 	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
-	Redis RedisConfig `yaml:"redis"`
-	MySQL map[string]MySQLConfig `yaml:"mysql"`
+	Redis       RedisConfig            `yaml:"redis"`
+	MySQL       map[string]MySQLConfig `yaml:"mysql"`
+	Ghostscript GhostscriptConfig      `yaml:"ghostscript"`
+}
+
+type GhostscriptConfig struct {
+	Path              string   `yaml:"path"`
+	CompressionLevels []string `yaml:"compression_levels"`
 }
 
 type RedisConfig struct {

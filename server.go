@@ -3,10 +3,12 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"watcher/config"
 	"watcher/handlers"
 
 	"github.com/gorilla/mux" // Import Gorilla Mux
+	"github.com/robfig/cron/v3"
 )
 
 func skip(next http.Handler) http.Handler {
@@ -34,6 +36,13 @@ func main() {
 		return
 	}
 
+	c := cron.New()
+	c.AddFunc("@daily", func() {
+		fmt.Println("Running daily cleanup...")
+		cleanupDirs("tmp/pdfcompression/input", "tmp/pdfcompression/output")
+	})
+	c.Start()
+
 	router := mux.NewRouter() // Create a new Gorilla Mux router
 
 	// Public routes (no authentication required)
@@ -55,6 +64,7 @@ func main() {
 	authenticatedRouter.HandleFunc("/docvault/get", handlers.GetDocVaultHandler).Methods("GET")
 	authenticatedRouter.HandleFunc("/auth/session", handlers.GetSessionHandler).Methods("GET")
 	authenticatedRouter.HandleFunc("/mfwp/get/{npwp:[0-9]{15}}", handlers.GetMfwpData).Methods("GET")
+	authenticatedRouter.HandleFunc("/utils/pdfcompression", handlers.PDFCompressionHandler).Methods("POST")
 
 	fmt.Println("Server starting on port http://localhost:3000/ ")
 	// Use the Gorilla Mux router
@@ -62,3 +72,19 @@ func main() {
 		fmt.Printf("Error starting server: %s\n", err)
 	}
 }
+
+func cleanupDirs(dirs ...string) {
+	for _, dir := range dirs {
+		err := os.RemoveAll(dir)
+		if err != nil {
+			fmt.Printf("Error cleaning up directory %s: %v\n", dir, err)
+		} else {
+			fmt.Printf("Cleaned up directory: %s\n", dir)
+		}
+		err = os.MkdirAll(dir, 0755)
+		if err != nil {
+			fmt.Printf("Error recreating directory %s: %v\n", dir, err)
+		}
+	}
+}
+

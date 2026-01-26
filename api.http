@@ -32,9 +32,10 @@ GET http://localhost:3000/outbox/get
 
 ### 🖨️ 🖨️ 🖨️ DOCVAULT / SCAN DOKUMEN
 
+### Update
 GET http://localhost:3000/docvault/update
 
-###
+### Get
 
 GET http://localhost:3000/docvault/get
 

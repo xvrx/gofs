@@ -10,7 +10,10 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-require filippo.io/edwards25519 v1.1.0 // indirect
+require (
+	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/robfig/cron/v3 v3.0.1
+)
 
 require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
