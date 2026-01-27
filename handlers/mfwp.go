@@ -15,9 +15,17 @@ func GetMfwpData(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	npwp := vars["npwp"]
 
+	print(npwp)
+
 	// Validate NPWP: must be 15 digits
 	if match, _ := regexp.MatchString(`^\d{15}$`, npwp); !match {
+
+		print("npwp invalid \n")
 		http.Error(w, "Invalid NPWP format. It must be 15 digits.", http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{
+			"status":  "false",
+			"message": "NPWP must be exactly 15 numeric digits",
+		})
 		return
 	}
 

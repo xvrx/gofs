@@ -41,4 +41,9 @@ GET http://localhost:3000/docvault/get
 
 
 ### GET NPWP ⚡⚡
-GET http://localhost:3000/mfwp/get/010000131217002
+GET http://localhost:3000/mfwp/get/01000013127002
+
+
+### COMPRESS 📄📄
+
+POST http://localhost:3000/utils/pdfcompression
