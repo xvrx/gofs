@@ -47,3 +47,8 @@ GET http://localhost:3000/mfwp/get/01000013127002
 ### COMPRESS 📄📄
 
 POST http://localhost:3000/utils/pdfcompression
+content-type: application/json
+
+{
+    "compressionLevel": "25"
+}

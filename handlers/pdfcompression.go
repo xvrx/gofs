@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"watcher/config"
 
 	"github.com/google/uuid"
 )
@@ -22,23 +21,23 @@ type PDFCompressionResponse struct {
 	AvailableCompressionLevels []string `json:"availableCompressionLevels"`
 }
 
-func PDFCompressionHandler(w http.ResponseWriter, r *http.Request) {
+var availableLevels = []string{"25", "50", "75", "90", "ghost"}
 
+func PDFCompressionHandler(w http.ResponseWriter, r *http.Request) {
+	// new var to store req,body
 	var req PDFCompressionRequest
+
+	// decode r.Body store it in the var address
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	if _, err := os.Stat(config.AppConfig.Ghostscript.Path); os.IsNotExist(err) {
-		http.Error(w, "Ghostscript binary not found at the configured path", http.StatusInternalServerError)
-		return
-	}
-
-	if !isValidCompressionLevel(req.CompressionLevel, config.AppConfig.Ghostscript.CompressionLevels) {
+	if !isValidCompressionLevel(req.CompressionLevel, availableLevels) {
 		resp := PDFCompressionResponse{
 			Message:                    "Invalid compression level",
-			AvailableCompressionLevels: config.AppConfig.Ghostscript.CompressionLevels,
+			AvailableCompressionLevels: availableLevels,
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
@@ -64,26 +63,107 @@ func PDFCompressionHandler(w http.ResponseWriter, r *http.Request) {
 	resp := PDFCompressionResponse{
 		OutputPath:                 outputPath,
 		Message:                    "PDF compressed successfully",
-		AvailableCompressionLevels: config.AppConfig.Ghostscript.CompressionLevels,
+		AvailableCompressionLevels: availableLevels,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
 }
 
-func compressPDF(inputPath, outputPath, compressionLevel string) error {
-	gsPath := config.AppConfig.Ghostscript.Path
+func getCompressionArgs(level string) []string {
+	levels := map[string][]string{
+		"25": {
+			"-sDEVICE=pdfwrite",
+			"-dCompatibilityLevel=1.4",
+			"-dDownsampleColorImages=true",
+			"-dDownsampleGrayImages=true",
+			"-dDownsampleMonoImages=true",
+			"-dColorImageResolution=150",
+			"-dGrayImageResolution=150",
+			"-dMonoImageResolution=150",
+			"-dColorImageDownsampleType=/Bicubic",
+			"-dGrayImageDownsampleType=/Bicubic",
+			"-dMonoImageDownsampleType=/Subsample",
+			"-dJPEGQ=85",
+			"-dNOPAUSE",
+			"-dQUIET",
+			"-dBATCH",
+		},
+		"50": {
+			"-sDEVICE=pdfwrite",
+			"-dCompatibilityLevel=1.4",
+			"-dDownsampleColorImages=true",
+			"-dDownsampleGrayImages=true",
+			"-dDownsampleMonoImages=true",
+			"-dColorImageResolution=120",
+			"-dGrayImageResolution=120",
+			"-dMonoImageResolution=120",
+			"-dColorImageDownsampleType=/Bicubic",
+			"-dGrayImageDownsampleType=/Bicubic",
+			"-dMonoImageDownsampleType=/Subsample",
+			"-dJPEGQ=70",
+			"-dNOPAUSE",
+			"-dQUIET",
+			"-dBATCH",
+		},
+		"75": {
+			"-sDEVICE=pdfwrite",
+			"-dCompatibilityLevel=1.4",
+			"-dDownsampleColorImages=true",
+			"-dDownsampleGrayImages=true",
+			"-dDownsampleMonoImages=true",
+			"-dColorImageResolution=100",
+			"-dGrayImageResolution=100",
+			"-dMonoImageResolution=100",
+			"-dColorImageDownsampleType=/Bicubic",
+			"-dGrayImageDownsampleType=/Bicubic",
+			"-dMonoImageDownsampleType=/Subsample",
+			"-dJPEGQ=60",
+			"-dNOPAUSE",
+			"-dQUIET",
+			"-dBATCH",
+		},
+		"90": {
+			"-sDEVICE=pdfwrite",
+			"-dCompatibilityLevel=1.4",
+			"-dDownsampleColorImages=true",
+			"-dDownsampleGrayImages=true",
+			"-dDownsampleMonoImages=true",
+			"-dColorImageResolution=72",
+			"-dGrayImageResolution=72",
+			"-dMonoImageResolution=72",
+			"-dColorImageDownsampleType=/Bicubic",
+			"-dGrayImageDownsampleType=/Bicubic",
+			"-dMonoImageDownsampleType=/Subsample",
+			"-dJPEGQ=45",
+			"-dNOPAUSE",
+			"-dQUIET",
+			"-dBATCH",
+		},
+		"ghost": {
+			"-dPDFSETTINGS=/ebook",
+			"-dDownsampleColorImages=true",
+			"-dDownsampleGrayImages=true",
+			"-dDownsampleMonoImages=true",
+			"-dColorImageResolution=100",
+			"-dGrayImageResolution=100",
+			"-dMonoImageResolution=100",
+			"-dColorImageDownsampleType=/Bicubic",
+			"-dGrayImageDownsampleType=/Bicubic",
+			"-dMonoImageDownsampleType=/Subsample",
+			"-dJPEGQ=60",
+			"-dAutoRotatePages=/None",
+		},
+	}
+	return levels[level]
+}
 
-	cmd := exec.Command(gsPath,
-		"-sDEVICE=pdfwrite",
-		"-dCompatibilityLevel=1.4",
-		"-dPDFSETTINGS=/"+compressionLevel,
-		"-dNOPAUSE",
-		"-dQUIET",
-		"-dBATCH",
-		"-sOutputFile="+outputPath,
-		inputPath,
-	)
+func compressPDF(inputPath, outputPath, compressionLevel string) error {
+	gsPath := "gsc"
+	args := getCompressionArgs(compressionLevel)
+	args = append(args, "-sOutputFile="+outputPath, inputPath)
+
+	cmd := exec.Command(gsPath, args...)
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {

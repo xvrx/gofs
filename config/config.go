@@ -13,14 +13,8 @@ import (
 )
 
 type Config struct {
-	Redis       RedisConfig            `yaml:"redis"`
-	MySQL       map[string]MySQLConfig `yaml:"mysql"`
-	Ghostscript GhostscriptConfig      `yaml:"ghostscript"`
-}
-
-type GhostscriptConfig struct {
-	Path              string   `yaml:"path"`
-	CompressionLevels []string `yaml:"compression_levels"`
+	Redis RedisConfig            `yaml:"redis"`
+	MySQL map[string]MySQLConfig `yaml:"mysql"`
 }
 
 type RedisConfig struct {
