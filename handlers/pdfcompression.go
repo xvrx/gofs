@@ -153,6 +153,9 @@ func getCompressionArgs(level string) []string {
 			"-dMonoImageDownsampleType=/Subsample",
 			"-dJPEGQ=60",
 			"-dAutoRotatePages=/None",
+			"-dNOPAUSE",
+			"-dQUIET",
+			"-dBATCH",
 		},
 	}
 	return levels[level]

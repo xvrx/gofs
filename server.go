@@ -53,12 +53,9 @@ func main() {
 	// uncomment line below
 	// authenticatedRouter.Use(handlers.AuthMiddleware)
 
-
-	//! ---------- no auth --- dev only -- 
+	//! ---------- no auth --- dev only --
 	//! to activate auth on route,comment line below and uncomment out the auth middleware
 	authenticatedRouter.Use(skip)
-
-
 
 	// ---------- route requiring authentication
 	authenticatedRouter.HandleFunc("/", handlers.HomeHandler).Methods("GET")
@@ -92,4 +89,3 @@ func cleanupDirs(dirs ...string) {
 		}
 	}
 }
-
