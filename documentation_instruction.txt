@@ -1,0 +1,180 @@
+single-source collaborative documentation
+---
+description :
+collaborative markdown platform working for multiple users imitating git mechanism but only with review + merge workflow. Each markdown document is stored as a blob (a file containing the full content or a hash-based representation). Every change creates a new blob — old blobs are immutable. A commit is a small Go struct pointing to a blob, with metadata (author, timestamp, parent commit). Pull requests just reference head and base commits, plus reviewer info. Merges update the main commit pointer to the new commit if approved by user with authorized role
+
+
+FILE MANAGEMENT
+---
+example : api guideline documentation:
+
+/documentations : main folder where all documentations are stored
+
+/documentations/api-guidelines : main folder for documentation 'api-guidelines'
+
+/documentations/api-guidelines/main.md: the main markdown file where current version of doc is contained
+
+/documentations/api-guidelines/media : folder containing media embedded in the markdown file
+
+/documentations/api-guidelines/refs/ : containing pointers (main,drafts,prs)
+
+/documentations/api-guidelines/objects : versioning internals (such as blobs, commits, pull requests)
+
+API 
+---
+1. Document Management
+POST /docs
+-> initiate a new markdown document from client
+
+GET /docs/{docId}
+-> get latest approved version of a document
+
+PUT /docs/{docId}/draft
+-> edit document in a draft branch
+
+2. Versioning
+POST /docs/{docId}/commits
+-> save a commit (checkpoint) for current draft
+
+GET /docs/{docId}/commits
+-> get commit history for a document
+
+GET /docs/{docId}/commits/{commitId}
+-> get content of a specific commit
+
+3. Pull Request Workflow
+POST /docs/{docId}/pull-requests
+-> create a pull request from draft to main
+
+GET /docs/{docId}/pull-requests
+-> list pull requests for a document
+
+GET /pull-requests/{prId}
+-> get pull request details (title, description, diff)
+
+PUT /pull-requests/{prId}/reviewers
+-> assign reviewers to a pull request
+
+4. Reviews & Comments
+POST /pull-requests/{prId}/reviews
+-> approve or request changes on a PR
+
+POST /pull-requests/{prId}/comments
+-> add inline comment to a PR (line-based)
+
+PUT /comments/{commentId}/resolve
+-> resolve or unresolve a comment thread
+
+5. Merge & Conflict Handling
+POST /pull-requests/{prId}/merge
+-> merge approved pull request into main
+
+GET /pull-requests/{prId}/conflicts
+-> detect merge conflicts
+
+PUT /pull-requests/{prId}/conflicts
+-> submit manual conflict resolution
+
+6. Users & Roles
+GET /users
+-> list users
+
+PUT /users/{userId}/role
+-> assign role (contributor, reviewer, supervisor)
+
+7. Audit & Activity (Optional)
+GET /activity
+-> get global activity log
+
+GET /users/{userId}/notifications
+-> get pending notifications for a user
+
+✅ MVP API Summary (Ultra-Condensed)
+/docs                      -> documents
+/docs/{id}/commits         -> versioning
+/docs/{id}/pull-requests   -> review workflow
+/pull-requests/{id}        -> PR lifecycle
+/users                     -> roles & permissions
+
+
+1. Document Management
+
+Create Document – Users can create a new markdown document.
+
+View Document – Load the latest approved version for reading.
+
+Edit Document (Draft Branch) – Users make edits in isolated branches/drafts.
+
+Purpose: Provides the basic container for collaboration.
+
+2. Versioning
+
+Save Commit / Checkpoint – Snapshots of document edits (immutable).
+
+View History – Users can see past commits to track changes.
+
+Purpose: Ensures every change is trackable and reversible.
+
+3. Pull Request Workflow
+
+Create Pull Request – Propose merging edits into the main branch.
+
+Assign Reviewers – Define who must approve changes.
+
+View PR Details – Title, description, diff of changes.
+
+Purpose: Centralizes review before changes affect the main document.
+
+4. Reviews & Comments
+
+Approve / Request Changes – Reviewers accept or reject PRs.
+
+Inline Comments – Attach feedback to specific lines in the document.
+
+Resolve / Unresolve Threads – Mark discussions as addressed.
+
+Purpose: Enables structured collaboration and feedback.
+
+5. Merge & Conflict Handling
+
+Merge PR – Supervisor applies approved changes to main branch.
+
+Conflict Detection – Detect overlapping edits between branches.
+
+Conflict Resolution – Resolve conflicts manually if detected.
+
+Purpose: Safely integrates edits into canonical version.
+
+6. Users & Roles
+
+Contributor – Can create branches, commit, open PRs.
+
+Reviewer – Can review PRs and leave comments.
+
+Supervisor – Can merge approved PRs.
+
+Purpose: Defines minimal permissions to maintain order.
+
+7. Audit & Activity (Optional but Useful)
+
+Activity Log – Track who made changes, opened PRs, approved, or merged.
+
+Notifications – Alert users when PRs require attention.
+
+Purpose: Transparency and accountability (can be added after MVP).
+
+✅ Summary of “Basic Features MVP”
+
+Document creation & editing
+
+Commit / versioning
+
+Pull requests
+
+Reviews & comments
+
+Merge + conflicts
+
+User roles / permissions
+
+(Optional) Audit & notifications

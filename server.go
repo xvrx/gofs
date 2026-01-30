@@ -67,6 +67,8 @@ func main() {
 	authenticatedRouter.HandleFunc("/auth/session", handlers.GetSessionHandler).Methods("GET")
 	authenticatedRouter.HandleFunc("/mfwp/get/{npwp:[0-9]{15}}", handlers.GetMfwpData).Methods("GET")
 	authenticatedRouter.HandleFunc("/utils/pdfcompression", handlers.PDFCompressionHandler).Methods("POST")
+	authenticatedRouter.HandleFunc("/docs/generate", handlers.DocsGenerateHandler).Methods("GET") // generate markdown from based on /raw/*
+	authenticatedRouter.HandleFunc("/docs/create", handlers.CreateDocHandler).Methods("POST")     // init new documentation
 
 	fmt.Println("Server starting on port http://localhost:3000/ ")
 	// Use the Gorilla Mux router
