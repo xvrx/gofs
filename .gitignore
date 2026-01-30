@@ -1,6 +1,7 @@
 
 
 /src/**/*.pdf
+/documentations/**/*.pdf
 /src/**/*.xlsx
 /src/**/*.xls
 /src/**/*.doc
